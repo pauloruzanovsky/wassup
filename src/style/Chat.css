@@ -1,0 +1,73 @@
+.app {
+    display: grid;
+    grid-template-rows: 1fr 13fr;
+    grid-template-columns: 250px 1fr;
+    border: 1px solid #ccc;
+    height: 900px;
+    font-family: 'Open Sans', sans-serif;
+}
+
+header {
+    grid-column: 1 / 3;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #ccc;
+    padding: 10px;
+}
+
+.sidebar {
+    grid-column: 1/1;
+    padding: 10px;
+    border-right: 1px solid #ccc;
+}
+
+.main {
+    padding: 10px;
+    overflow-y:scroll;
+    display: grid;
+}
+
+.chat-container {
+    overflow-y:scroll;
+}
+
+.chat-form {
+    width: 100%;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    align-self: flex-end;
+}
+
+input {
+    flex-grow: 1;
+    border-radius: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+input:focus{ 
+    outline: 0px;
+}
+
+.submit-button {
+    background: white;
+    color: white;
+    border: 0px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+}
+
+.send-img {
+    width: 50%;
+    height: 50%;
+}
+
+.submit-button:hover {
+    background:rgb(243, 242, 242);
+}

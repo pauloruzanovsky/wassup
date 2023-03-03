@@ -1,0 +1,47 @@
+
+.message {
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.message.sent > .text-wrapper {
+    background: rgb(184, 211, 241);
+
+
+
+}
+
+.message.received > .text-wrapper{
+    background: rgb(238, 237, 237);
+
+}
+
+.avatar {
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+}
+
+.text-wrapper {
+    padding: 10px;
+    font-size: 12px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.name-and-time{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.display-name {
+    font-weight: 600;
+}
+
+.time {
+    font-size: 0.6rem;
+}
