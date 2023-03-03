@@ -15,7 +15,7 @@ export default function Chat(props:any) {
 
     const user = auth.currentUser;
     const [currentDb, setCurrentDb] = useState('welcome');
-    const [rooms, setRooms] = useState([]);
+    const [rooms, setRooms] = useState<any[]>([]);
     const [formValue, setFormValue] = useState('');
     
     const messagesRef = collection(fireStore,`rooms/${currentDb}/chat-messages`);
@@ -56,35 +56,32 @@ export default function Chat(props:any) {
     }
 
     useEffect(() => {
-        let newRooms:[] = [];
-        
-            roomsData?.forEach((room:any) => newRooms.push(room))
 
-            setRooms([...newRooms])
+        addUsersToPublicRooms()
+        let newRooms:any[] = [];
+        roomsData?.forEach((room:any) => newRooms.push(room))
 
-        
-        
+        setRooms([...newRooms])
 
     },[roomsData])
 
 
-    // useEffect( async () => {
-    //     await addUsersToPublicRooms()
+    useEffect(() => {
        
-    // },[user])
+    },[roomsData])
 
-    // const addUsersToPublicRooms = async () => {
-    //     roomsData?.forEach((room:any) => {
-    //         if(room.type === 'public') {
-    //              setDoc(doc(fireStore,'rooms',room.title), 
-    //                 {
-    //                 ...room,
-    //                 users: [...room.users, props.user.uid]  
-    //                 }
-    //             )
-    //         }
-    //     })
-    // }
+    const addUsersToPublicRooms = () => {
+         roomsData?.forEach((room:any) => {
+            if(room.type === 'public' && !room.users.includes(props.user.uid)) {
+                  setDoc(doc(fireStore,'rooms',room.title), 
+                    {
+                    ...room,
+                    users: [...room.users, props.user.uid]  
+                    }
+                )
+            }
+        })
+    }
 
     
     return(
