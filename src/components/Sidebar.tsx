@@ -1,10 +1,10 @@
 
 import '../style/Sidebar.css'
 import addIcon from '../assets/plus.png'
-import React, {useState, useEffect, } from 'react'
+import {useState, useEffect, } from 'react'
 import {Link} from 'react-router-dom'
-import { fireStore,auth } from './firebase';
-import {collection, query, orderBy, limit, setDoc, doc, serverTimestamp} from 'firebase/firestore';
+import { fireStore, auth } from './firebase';
+import {setDoc, doc, serverTimestamp} from 'firebase/firestore';
 
 
 export default function Sidebar(props:any) {
@@ -31,7 +31,6 @@ export default function Sidebar(props:any) {
         }
        
     }
-    console.log(props.user.uid)
     useEffect(() => {
 
         const hideModal = (event:any) => {
@@ -86,11 +85,13 @@ export default function Sidebar(props:any) {
                     </div>
                     {newRoomModal && <div className='new-room-modal'>
                         <form className='new-room-form'>
+                            <div>Create a room</div>
                             <input value={newRoomInputValue}
                                     onChange={(e) => setNewRoomInputValue(e.target.value)}
                                     className='new-room-input' 
-                                    placeholder='New room name'/>
-                            
+                                    placeholder='Room name'/>
+
+                            <div style={{color: 'red'}}>Can't add users yet, functionality will be added soon!</div>
                             <button 
                                 onClick={createNewRoom}
                                 className='new-room-submit-button'>Create Room</button>
