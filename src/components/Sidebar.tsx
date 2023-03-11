@@ -3,7 +3,7 @@ import '../style/Sidebar.css'
 import addIcon from '../assets/plus.png'
 import {useState, useEffect, } from 'react'
 import {Link} from 'react-router-dom'
-import { fireStore, auth } from './firebase';
+import { fireStore } from './firebase';
 import {setDoc, doc, serverTimestamp} from 'firebase/firestore';
 
 
@@ -22,7 +22,8 @@ export default function Sidebar(props:any) {
                 title: newRoomInputValue,
                 createdAt: serverTimestamp(),
                 type: 'private',
-                users: [props.user.uid]
+                users: [props.user.email],
+                admins: [props.user.email]
     
             }).then(() => {
                 setNewRoomInputValue('')
@@ -31,6 +32,9 @@ export default function Sidebar(props:any) {
         }
        
     }
+
+    
+
     useEffect(() => {
 
         const hideModal = (event:any) => {
@@ -55,7 +59,7 @@ export default function Sidebar(props:any) {
         <nav className='sidebar'>
                 <div className='chats'>
                     <div className='rooms-title'>
-                        <h3>Chats</h3>
+                        <h3>Personal Chats</h3>
                         <button className='new chat'>
                             <img src={addIcon}/>
                         </button>
@@ -75,7 +79,7 @@ export default function Sidebar(props:any) {
                     </div>
                     <div className='rooms-content'>
                         {props.rooms && props.rooms.map((room:any) => {
-                            if(room.users.includes(props.user.uid)) {
+                            if(room.users.includes(props.user.email)) {
                                 return(
                                     <Link to={`/${room.title}`} onClick={props.switchChat} key={room.title}>{room.title}</Link>
                                 )
@@ -90,8 +94,6 @@ export default function Sidebar(props:any) {
                                     onChange={(e) => setNewRoomInputValue(e.target.value)}
                                     className='new-room-input' 
                                     placeholder='Room name'/>
-
-                            <div style={{color: 'red'}}>Can't add users yet, functionality will be added soon!</div>
                             <button 
                                 onClick={createNewRoom}
                                 className='new-room-submit-button'>Create Room</button>
