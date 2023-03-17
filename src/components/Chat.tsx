@@ -34,6 +34,9 @@ export default function Chat(props:any) {
     const [addUserInputValue, setAddUserInputValue] = useState("");
     const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
     const [addUserModal, setAddUserModal] = useState(false);
+    const [removeUserModal, setRemoveUserModal] = useState(false);
+
+
 
     console.log('currentroom:', currentRoom?.admins);
     const sendMessage = async(e:any) => {
@@ -67,11 +70,11 @@ export default function Chat(props:any) {
 
     const addUserToPublicRooms = () => {
         roomsData?.forEach((room:any) => {
-           if(room.type === 'public' && !room.users.includes(props.user.uid)) {
+           if(room.type === 'public' && !room.users.includes(props.user.email)) {
                  setDoc(doc(fireStore,'rooms',room.title), 
                    {
                    ...room,
-                   users: [...room.users, props.user.uid]  
+                   users: [...room.users, props.user.email]  
                    }
                )
            }
@@ -83,13 +86,32 @@ export default function Chat(props:any) {
        setFilteredUsers([])
        const newFilteredUsers:any[] = []
        props.usersData.forEach((user:any) => {
-           if(user.displayName.toLowerCase().includes(e.target.value.toLowerCase()) && e.target.value) {
+        const shouldShowUser = user.displayName.toLowerCase().includes(e.target.value.toLowerCase()) && e.target.value && !currentRoom.users.includes(user.email)
+           if(shouldShowUser) {
                newFilteredUsers.push(user)
            }
        })
        setFilteredUsers(newFilteredUsers)
        console.log('filteredUsers:', filteredUsers)
        
+   }
+
+   const addUserToRoom = (e:any) => {
+
+    const emailOfUserToBeAdded = e.target.querySelector('.text-wrapper').querySelector('.suggestion-user-email').textContent
+    if(currentRoom){
+        setDoc(doc(fireStore,'rooms',currentRoom.title), 
+        {
+        ...currentRoom,
+        users: [...currentRoom.users, emailOfUserToBeAdded]  
+        }
+    )
+    setAddUserModal(false);
+    setAddUserInputValue('');
+    console.log(`${emailOfUserToBeAdded} added to room`)
+
+    }
+    
    }
 
     useEffect(() => {
@@ -124,6 +146,7 @@ export default function Chat(props:any) {
                 setAddUserModal(false);
                 console.log('modal hidden')
                 document.removeEventListener("click", hideModal)
+                setAddUserInputValue('')
             }
         }
 
@@ -148,28 +171,14 @@ export default function Chat(props:any) {
                 <div className='main'>
                     <div className='chat-header'>
                         <div className='chat-title'>{currentDb}</div>
-                        {currentRoom?.admins.includes(user?.email) &&
+                        {currentRoom && currentRoom.admins.includes(user?.email) &&
                           <div className='chat-header-icons'>
                             <img src={addUserIcon} title='Add a user to this room' className='add-user-icon'onClick={() => {setAddUserModal(true)}}/>
-                            {addUserModal && 
-                            <div className='add-user-modal'>
-                                <p>Add User</p>
-                                <input value={addUserInputValue}
-                                    onChange={handleNewUserInputChange}
-                                    placeholder='User to be added'/> 
-                                <div className='suggestion-box'>
-                                    {filteredUsers.map(user => 
-                                    <div className='suggestion-user' onClick={() => {setAddUserInputValue(user.email)}}>
-                                        <img className='avatar'src={user.photoURL}/>
-                                        <div className='text-wrapper'>
-                                            <div className='suggestion-user-name'>{user.displayName}</div>
-                                            <div className='suggestion-user-email'>{user.email}</div>
-                                        </div>
-                                    </div>)}
-                                </div>
-                            </div>
+                            {addUserModal && <AddUserModal/>
                                 }
-                            <img src={removeUserIcon} style={{height:'1em'}}/>
+                            <img src={removeUserIcon} title='Remove a user from this room' className='remove-user-icon' onClick={() => {setRemoveUserModal(true)}}/>
+                            {removeUserModal && <RemoveUserModal/>
+}
                         </div> }
                     </div>
                     <Routes>
@@ -200,4 +209,37 @@ export default function Chat(props:any) {
         </BrowserRouter>
 
     )
+
+    function AddUserModal() {
+        return <div className='add-user-modal'>
+            <p>Add User</p>
+            <input value={addUserInputValue}
+                onChange={handleNewUserInputChange}
+                placeholder='User to be added' />
+            {addUserInputValue && <div className='suggestion-box'>
+                {currentRoom.users.map(user => <div className='suggestion-user' onClick={addUserToRoom}>
+                    <img className='avatar' src={user.photoURL} />
+                    <div className='text-wrapper'>
+                        <div className='suggestion-user-name'>{user.displayName}</div>
+                        <div className='suggestion-user-email'>{user.email}</div>
+                    </div>
+                </div>)}
+            </div>}
+        </div>;
+    }
+
+    function RemoveUserModal() {
+        return <div className='remove-user-modal'>
+            <p>Remove User</p>
+            <div className='suggestion-box'>
+                {filteredUsers.map(user => <div className='suggestion-user'>
+                    <img className='avatar' src={user.photoURL} />
+                    <div className='text-wrapper'>
+                        <div className='suggestion-user-name'>{user.displayName}</div>
+                        <div className='suggestion-user-email'>{user.email}</div>
+                    </div>
+                </div>)}
+            </div>
+        </div>;
+    }
 }

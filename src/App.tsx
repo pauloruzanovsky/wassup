@@ -13,25 +13,25 @@ export default function App() {
     
     const usersCollection = collection(fireStore,'users')
     const [usersData, isLoading] = useCollectionData(usersCollection);
-    const [user] = useAuthState(auth);
+    const user = auth.currentUser;
     const [users, setUsers] = useState<any[]>([])
 
 
     const registerUser = () => {
-        const currentUser = auth.currentUser;
-        const exists = usersData?.find(user => user.email === currentUser?.email)
-           if(!exists && currentUser) {
-                 setDoc(doc(fireStore,'users', currentUser.uid), 
-                   {
-                    uid: currentUser.uid,
-                    displayName: currentUser.displayName,
-                    photoURL: currentUser.photoURL,
-                    email: currentUser.email,
-                    }
-               )
-            console.log('user logged.')
-
-           }
+        if(user) {
+            const exists = usersData?.find(userdata => userdata.email === user?.email)
+            if(!exists) {
+                setDoc(doc(fireStore,'users', user.uid), 
+                    {
+                        uid: user.uid,
+                        displayName: user.displayName,
+                        photoURL: user.photoURL,
+                        email: user.email,
+                        }
+                )
+                console.log('user logged.')
+            }
+        }
    }
 
     const handleSignUp = () => {
@@ -42,19 +42,19 @@ export default function App() {
         auth.signOut()
     }
 
-    useEffect(() => {
-        if(usersData && user) {
-            registerUser()
-
-        }
-    },[user])
+    // useEffect(() => {
+    //     const unsubscribe = auth.onAuthStateChanged((user) => {
+    //         if(user) {
+    //             registerUser()
+    //         }
+    //     })
+    //     return unsubscribe;
+    // },[])
 
     useEffect(() => {
         if(!isLoading && usersData) {
             setUsers(usersData);
-            
         }
-
     },[isLoading])
 
     return (

@@ -40,7 +40,7 @@ export default function ChatMessage(props:any) {
     return (
         <>
             <div className={`message ${messageClass}`}>
-                <img className='avatar' src={photoURL}/>
+                <img className='avatar' src={photoURL} referrerPolicy='no-referrer'/>
                 <div className='text-wrapper'>
                     <div className='name-and-time'>
                         <div className='display-name'>{displayName}</div>
