@@ -79,13 +79,11 @@ header > button:active {
     height: 1em;
 }
 
-.add-user-icon {
+.add-user-icon, .chat-settings-icon {
     height: 1em;
 }
-.add-user-icon:hover, .remove-user-icon:hover {
+.add-user-icon:hover, .chat-settings-icon:hover {
     cursor: pointer;
-    width: 22px;
-    height: 22px;
 }
 
 .chat-form {
@@ -96,7 +94,7 @@ header > button:active {
     align-self: flex-end;
 }
 
-.add-user-modal, .remove-user-modal {
+.add-user-modal, .remove-user-modal, .chat-settings-modal {
     position: absolute;
     top: 110px;
     right: 15px;
@@ -119,11 +117,11 @@ header > button:active {
     margin: 10px;
 }
 
-.suggestion-user  {
+.suggestion-user {
     display: flex;
     align-items: center;
     cursor: pointer;
-    padding: 10px;
+    padding: 10px;;
 }
 
 .suggestion-user:hover {

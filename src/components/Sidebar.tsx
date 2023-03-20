@@ -22,8 +22,8 @@ export default function Sidebar(props:any) {
                 title: newRoomInputValue,
                 createdAt: serverTimestamp(),
                 type: 'private',
-                users: [props.user.email],
-                admins: [props.user.email]
+                users: [JSON.parse(JSON.stringify(props.user))],
+                admins: [JSON.parse(JSON.stringify(props.user))]
     
             }).then(() => {
                 setNewRoomInputValue('')
@@ -79,7 +79,7 @@ export default function Sidebar(props:any) {
                     </div>
                     <div className='rooms-content'>
                         {props.rooms && props.rooms.map((room:any) => {
-                            if(room.users.includes(props.user.email)) {
+                            if(room.users.some((roomUser:any) => roomUser.email === props.user.email)) {
                                 return(
                                     <Link to={`/${room.title}`} onClick={props.switchChat} key={room.title}>{room.title}</Link>
                                 )

@@ -3,13 +3,14 @@ import {fireStore,auth} from './firebase';
 import {collection, query, orderBy, limit, addDoc, setDoc, doc, serverTimestamp} from 'firebase/firestore';
 import {useCollectionData, useDocumentData} from 'react-firebase-hooks/firestore';
 import ChatMessage from './ChatMessage';
-import '../style/Chat.css'
-import '../style/Sidebar.css'
-import sendMsgIcon from '../assets/send-message.png'
+import ChatSettingsModal from './ChatSettingsModal'
 import Sidebar from './Sidebar';
 import {BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import addUserIcon from '../assets/add-user.png'
-import removeUserIcon from '../assets/remove-user.png'
+import settingsIcon from '../assets/setting.png'
+import sendMsgIcon from '../assets/send-message.png'
+import '../style/Chat.css'
+import '../style/Sidebar.css'
+
 
 export default function Chat(props:any) {
 
@@ -33,12 +34,8 @@ export default function Chat(props:any) {
 
     const [addUserInputValue, setAddUserInputValue] = useState("");
     const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
-    const [addUserModal, setAddUserModal] = useState(false);
-    const [removeUserModal, setRemoveUserModal] = useState(false);
+    const [showChatSettingsModal, setShowChatSettingsModal] = useState(false);
 
-
-
-    console.log('currentroom:', currentRoom?.admins);
     const sendMessage = async(e:any) => {
         e.preventDefault();
 
@@ -62,7 +59,6 @@ export default function Chat(props:any) {
         }
         
     }
-
     const switchChat = async(e:any) => {
     setCurrentDb(e.target.textContent)        
     setShouldScroll(true)
@@ -70,46 +66,53 @@ export default function Chat(props:any) {
 
     const addUserToPublicRooms = () => {
         roomsData?.forEach((room:any) => {
-           if(room.type === 'public' && !room.users.includes(props.user.email)) {
-                 setDoc(doc(fireStore,'rooms',room.title), 
-                   {
-                   ...room,
-                   users: [...room.users, props.user.email]  
-                   }
-               )
+           if(user && room.type === 'public' && !room.users.some((roomUser:any) => roomUser.email === user?.email)) {
+                setDoc(doc(fireStore,'rooms',room.title), 
+                            {
+                            ...room,
+                            users: [...room.users, {email: user?.email, displayName: user?.displayName, photoURL: user?.photoURL, uid: user?.uid}]  
+                            }
+                    )
            }
        })
    }
 
    const handleNewUserInputChange = (e:any) => {
+    console.log('usersData:', props.usersData)
        setAddUserInputValue(e.target.value)
        setFilteredUsers([])
        const newFilteredUsers:any[] = []
        props.usersData.forEach((user:any) => {
-        const shouldShowUser = user.displayName.toLowerCase().includes(e.target.value.toLowerCase()) && e.target.value && !currentRoom.users.includes(user.email)
-           if(shouldShowUser) {
-               newFilteredUsers.push(user)
-           }
+        if(currentRoom) {
+            const shouldShowUser =  user.displayName.toLowerCase().includes(e.target.value.toLowerCase()) && 
+                                    e.target.value && 
+                                    !currentRoom.users.some((roomUser:any) => roomUser.email === user.email)
+            if(shouldShowUser) {
+                newFilteredUsers.push(user)
+                setFilteredUsers(newFilteredUsers)
+
+            }
+        }
        })
-       setFilteredUsers(newFilteredUsers)
-       console.log('filteredUsers:', filteredUsers)
-       
    }
 
    const addUserToRoom = (e:any) => {
 
     const emailOfUserToBeAdded = e.target.querySelector('.text-wrapper').querySelector('.suggestion-user-email').textContent
     if(currentRoom){
-        setDoc(doc(fireStore,'rooms',currentRoom.title), 
-        {
-        ...currentRoom,
-        users: [...currentRoom.users, emailOfUserToBeAdded]  
-        }
-    )
-    setAddUserModal(false);
+        props.usersData.forEach((user:any) => {
+            if(user.email === emailOfUserToBeAdded) {
+                setDoc(doc(fireStore,'rooms',currentRoom.title), 
+                        {
+                        ...currentRoom,
+                        users: [...currentRoom.users, user]  
+                        }
+                )
+            }
+        })
+        
     setAddUserInputValue('');
     console.log(`${emailOfUserToBeAdded} added to room`)
-
     }
     
    }
@@ -138,13 +141,12 @@ export default function Chat(props:any) {
 
         const hideModal = (event:any) => {
             if (
-              !event.target.matches(".add-user-icon") &&
-              !event.target.closest(".add-user-modal") &&
-              addUserModal
+              !event.target.matches(".chat-settings-icon") &&
+              !event.target.closest(".chat-settings-modal") &&
+              !event.target.matches(".suggestion-user") &&
+              showChatSettingsModal
             ) { 
-                console.log(event.target)
-                setAddUserModal(false);
-                console.log('modal hidden')
+                setShowChatSettingsModal(false);
                 document.removeEventListener("click", hideModal)
                 setAddUserInputValue('')
             }
@@ -152,7 +154,7 @@ export default function Chat(props:any) {
 
        document.addEventListener("click",hideModal)    
         
-    },[addUserModal])
+    },[showChatSettingsModal])
 
 
     
@@ -171,15 +173,18 @@ export default function Chat(props:any) {
                 <div className='main'>
                     <div className='chat-header'>
                         <div className='chat-title'>{currentDb}</div>
-                        {currentRoom && currentRoom.admins.includes(user?.email) &&
-                          <div className='chat-header-icons'>
-                            <img src={addUserIcon} title='Add a user to this room' className='add-user-icon'onClick={() => {setAddUserModal(true)}}/>
-                            {addUserModal && <AddUserModal/>
+                            <div>
+                                <img src={settingsIcon} className='chat-settings-icon' title='Room settings' onClick={() => {setShowChatSettingsModal(true)}}/>
+                                {showChatSettingsModal && <ChatSettingsModal 
+                                                                            addUserInputValue={addUserInputValue}
+                                                                            handleNewUserInputChange={handleNewUserInputChange}
+                                                                            filteredUsers={filteredUsers}
+                                                                            addUserToRoom={addUserToRoom}
+                                                                            currentRoom={currentRoom}
+                                                                            currentUser={user}
+                                                                            />
                                 }
-                            <img src={removeUserIcon} title='Remove a user from this room' className='remove-user-icon' onClick={() => {setRemoveUserModal(true)}}/>
-                            {removeUserModal && <RemoveUserModal/>
-}
-                        </div> }
+                            </div>
                     </div>
                     <Routes>
                     <Route path={`/`} element={<Navigate to="/welcome"/>}/>
@@ -210,36 +215,4 @@ export default function Chat(props:any) {
 
     )
 
-    function AddUserModal() {
-        return <div className='add-user-modal'>
-            <p>Add User</p>
-            <input value={addUserInputValue}
-                onChange={handleNewUserInputChange}
-                placeholder='User to be added' />
-            {addUserInputValue && <div className='suggestion-box'>
-                {currentRoom.users.map(user => <div className='suggestion-user' onClick={addUserToRoom}>
-                    <img className='avatar' src={user.photoURL} />
-                    <div className='text-wrapper'>
-                        <div className='suggestion-user-name'>{user.displayName}</div>
-                        <div className='suggestion-user-email'>{user.email}</div>
-                    </div>
-                </div>)}
-            </div>}
-        </div>;
-    }
-
-    function RemoveUserModal() {
-        return <div className='remove-user-modal'>
-            <p>Remove User</p>
-            <div className='suggestion-box'>
-                {filteredUsers.map(user => <div className='suggestion-user'>
-                    <img className='avatar' src={user.photoURL} />
-                    <div className='text-wrapper'>
-                        <div className='suggestion-user-name'>{user.displayName}</div>
-                        <div className='suggestion-user-email'>{user.email}</div>
-                    </div>
-                </div>)}
-            </div>
-        </div>;
-    }
 }
