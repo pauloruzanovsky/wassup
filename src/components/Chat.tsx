@@ -64,10 +64,10 @@ export default function Chat(props:any) {
     setShouldScroll(true)
     }
 
-    const addUserToPublicRooms = () => {
+    const addUserToWelcomeRoom = () => {
         roomsData?.forEach((room:any) => {
-           if(user && room.type === 'public' && !room.users.some((roomUser:any) => roomUser.email === user?.email)) {
-                setDoc(doc(fireStore,'rooms',room.title), 
+           if(user && room.title === 'welcome' && !room.users.some((roomUser:any) => roomUser.email === user?.email)) {
+                setDoc(doc(fireStore,'rooms','welcome'), 
                             {
                             ...room,
                             users: [...room.users, {email: user?.email, displayName: user?.displayName, photoURL: user?.photoURL, uid: user?.uid}]  
@@ -119,7 +119,7 @@ export default function Chat(props:any) {
 
     useEffect(() => {
 
-        addUserToPublicRooms()
+        addUserToWelcomeRoom()
         let newRooms:any[] = [];
         roomsData?.forEach((room:any) => newRooms.push(room))
 
