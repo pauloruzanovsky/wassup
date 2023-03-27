@@ -1,7 +1,7 @@
 import { fireStore, auth, provider } from './components/firebase';
 import {signInWithPopup} from 'firebase/auth'
 import Chat from './components/Chat';
-import {collection, setDoc, doc} from 'firebase/firestore';
+import {collection, setDoc, doc, query, orderBy} from 'firebase/firestore';
 import {useCollectionData} from 'react-firebase-hooks/firestore';
 import  { useEffect } from 'react';
 import './style/App.css'
@@ -11,9 +11,11 @@ import './style/App.css'
 export default function App() {
     
     const usersCollection = collection(fireStore,'users')
-    const [usersData, isLoading] = useCollectionData(usersCollection);
+    const usersQuery = query(usersCollection, orderBy('displayName'));
+    const [usersData, isLoading] = useCollectionData(query(usersCollection, orderBy('displayName')));
     const user = auth.currentUser;
 
+    console.log(usersData);
     const registerUser = () => {
         if(user) {
             const exists = usersData?.find(userdata => userdata.email === user?.email)

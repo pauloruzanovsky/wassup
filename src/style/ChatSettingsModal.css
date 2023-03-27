@@ -4,10 +4,8 @@
     cursor: default;
 }
 
-
-.room-users {
-    padding: 15px;
-    padding-top: 0px;
+.room-users-title {
+    margin-bottom: -10px;
 }
 
 .remove-user-icon {
@@ -17,4 +15,34 @@
 
 .remove-user-icon:hover {
     cursor: pointer;
+}
+
+.add-user-section {
+    text-align: center;
+}
+
+
+.chat-settings-buttons {
+    display: flex;
+    gap: 10px;
+    
+}
+
+.chat-settings-button, .new-room-submit-button { 
+    background:#2492FF;
+    color: white;
+    border: 0px;
+    border-radius: 10px;
+    padding: 10px;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.chat-settings-button:hover, .new-room-submit-button:hover {
+    cursor: pointer;
+    background: rgb(26, 102, 146);
+}
+
+.chat-settings-button:active, .new-room-submit-button:active {
+    background: rgb(0, 0, 0);
 }

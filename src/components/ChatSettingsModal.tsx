@@ -1,10 +1,29 @@
 import '../style/ChatSettingsModal.css'
 import removeUserIcon from '../assets/delete.png'  
-import {doc, updateDoc} from 'firebase/firestore'
+import {doc, updateDoc, deleteDoc} from 'firebase/firestore'
 import {fireStore} from './firebase'
+import { Link } from 'react-router-dom'
 
 export default function ChatSettingsModal(props:any) {
-    const currentRoomDoc = doc(fireStore,'rooms',props.currentRoom.title)
+
+    if(props.currentRoom) {
+
+    const isCurrentUserAdmin = props.currentRoom.admins.some((admin:any) => admin.email === props.currentUser?.email)
+    const currentRoomDoc = props.currentRoom && doc(fireStore,'rooms',props.currentRoom.title)
+    const sortedRoomUsers = props.currentRoom.users.sort((a,b) => {
+        const nameA = a.displayName.toLowerCase()
+        const nameB = b.displayName.toLowerCase()
+
+        if(nameA < nameB) {
+            return -1
+        }
+
+        if(nameA > nameB) {
+            return 1
+
+        }
+        return 0
+    })
 
     const removeUserFromRoom = async (e:any) => {
         const emailOfUserToBeRemoved = e.target.parentElement.id
@@ -23,15 +42,57 @@ export default function ChatSettingsModal(props:any) {
         }
     }
 
-    console.log('currentUser: ', props.currentUser)
+    const leaveRoom = async () => {
 
-    const isCurrentUserAdmin = props.currentRoom.admins.some((admin:any) => admin.email === props.currentUser?.email)
+        const emailOfUserLeavingRoom = props.currentUser.email
+        const updatedUsersArray:any[] = [];
+        props.currentRoom?.users.forEach((user:any) => {
+            if(user.email !== emailOfUserLeavingRoom) {
+                updatedUsersArray.push(user)
+            }
+        })
+        if(currentRoomDoc) {
+           await updateDoc(currentRoomDoc, {
+            users: [...updatedUsersArray]
+           })
+           props.setCurrentDb('welcome')
+           props.setShouldScroll(true)
+           props.setShowChatSettingsModal(false)
+
+
+        }
+
+        
+    }
+
+    const deleteRoom = async () => {
+        await deleteDoc(currentRoomDoc).then(() => {
+            props.setCurrentDb('welcome')     
+            props.setShouldScroll(true)
+            props.setShowChatSettingsModal(false)
+   
+
+        })
+        }
+    
+
 
     return(
         <div className='chat-settings-modal'>
-            <div>Room Users</div>
+            <div className='chat-settings-buttons'>
+                <Link to='welcome'>                
+                    <button className='chat-settings-button' onClick={leaveRoom}>Leave Room</button>
+                </Link>
+                <Link to='welcome'>                
+                {isCurrentUserAdmin && <button className='chat-settings-button' onClick={deleteRoom}>Delete Room</button>}
+                </Link>
+
+            </div>
+                                
+
+            <div className='room-users-title'>Room Users</div>
             <div className='room-users'>
-                {props.currentRoom.users.map((user:any) => 
+                {sortedRoomUsers.map((user:any) => 
                 <div className="room-user" id={user.email} key={user.email}>
                     <img className='avatar' src={user.photoURL} />
                     <div className='text-wrapper'>
@@ -60,4 +121,5 @@ export default function ChatSettingsModal(props:any) {
             </div>}
         </div>
     )
+            }
 }

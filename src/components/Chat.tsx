@@ -5,7 +5,7 @@ import {useCollectionData, useDocumentData} from 'react-firebase-hooks/firestore
 import ChatMessage from './ChatMessage';
 import ChatSettingsModal from './ChatSettingsModal'
 import Sidebar from './Sidebar';
-import {BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import {BrowserRouter, Routes, Route, Navigate, useNavigate} from 'react-router-dom'
 import settingsIcon from '../assets/setting.png'
 import sendMsgIcon from '../assets/send-message.png'
 import '../style/Chat.css'
@@ -59,10 +59,18 @@ export default function Chat(props:any) {
         }
         
     }
-    const switchChat = async(e:any) => {
-    setCurrentDb(e.target.textContent)        
-    setShouldScroll(true)
-    }
+    const switchChat = (e:any) => {
+        setShouldScroll(true)
+        if(e.target.className === 'room') {
+            setCurrentDb(e.target.querySelector('.room-title').textContent)  
+            return      
+        }
+        const personalToSwitch = roomsData?.filter((room:any) => 
+                                                                room.type === 'personal' && 
+                                                                [room.firstUser.displayName,room.secondUser.displayName].includes(e.target.querySelector('.personal-name').textContent) && 
+                                                                [room.firstUser.displayName,room.secondUser.displayName].includes(props.user.displayName))[0].title
+        setCurrentDb(personalToSwitch)
+        }
 
     const addUserToWelcomeRoom = () => {
         roomsData?.forEach((room:any) => {
@@ -155,13 +163,13 @@ export default function Chat(props:any) {
        document.addEventListener("click",hideModal)    
         
     },[showChatSettingsModal])
-
-
     
     return(
         <BrowserRouter>
             <div className='app'>  
-                <header>Header
+                <header>
+                    <b className='header-text'>{`Hello ${props.user.displayName}!`}</b>
+                    <img className='user-avatar' src={props.user.photoURL} alt={props.user.displayName}/>
                     <button onClick={props.signOut}>Sign Out</button>
                 </header>
                 <Sidebar
@@ -169,10 +177,16 @@ export default function Chat(props:any) {
                     rooms={rooms}
                     setRooms={setRooms}
                     user={user}
-                    usersData={props.usersData}/>
+                    usersData={props.usersData}
+                    setCurrentDb={setCurrentDb}/>
                 <div className='main'>
                     <div className='chat-header'>
-                        <div className='chat-title'>{currentDb}</div>
+                        <div className='chat-title'>{currentRoom?.type === 'personal' ? 
+                            <>
+                            <div className='personal-title'>{currentRoom.firstUser.email === props.user.email ? currentRoom.secondUser.displayName : currentRoom.firstUser.displayName}</div>
+                            <div className='personal-email'>{currentRoom.firstUser.email === props.user.email ? currentRoom.secondUser.email : currentRoom.firstUser.email}</div>
+                            </>
+                            : currentRoom?.title}</div>
                             <div>
                                 <img src={settingsIcon} className='chat-settings-icon' title='Room settings' onClick={() => {setShowChatSettingsModal(true)}}/>
                                 {showChatSettingsModal && <ChatSettingsModal 
@@ -182,18 +196,29 @@ export default function Chat(props:any) {
                                                                             addUserToRoom={addUserToRoom}
                                                                             currentRoom={currentRoom}
                                                                             currentUser={user}
+                                                                            switchChat={switchChat}
+                                                                            setCurrentDb={setCurrentDb}
+                                                                            setShouldScroll={setShouldScroll}
+                                                                            setShowChatSettingsModal={setShowChatSettingsModal}
                                                                             />
-                                }
-                            </div>
-                    </div>
-                    <Routes>
-                    <Route path={`/`} element={<Navigate to="/welcome"/>}/>
-                    {rooms.map((room:any) => {
-                        return(
+                                    }
+                                </div>
+                        </div>
+                        <Routes>
+                        <Route path={`/*`} element={<Navigate to="/welcome"/>}/>
+                        <Route path={`/welcome`} element={<div className='chat-container'>
+                                                            <div className='chat-messages'>
+                                                {messages && messages.map((message:any) => (<ChatMessage key={message.id} message={message}/>
+                                                ))} 
+                                                <div ref={dummy}></div>
+                                            </div>
+                                            </div>}/>
+
+                        {rooms && rooms.map((room:any) => {
+                            return(
                             <Route path={`/${room.title}`} 
                                    key={room.title} 
                                    element={<div className='chat-container'>
-                                            
                                             <div className='chat-messages'>
                                                 {messages && messages.map((message:any) => (<ChatMessage key={message.id} message={message}/>
                                                 ))} 

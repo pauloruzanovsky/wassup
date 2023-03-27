@@ -7,7 +7,27 @@
 .rooms-content {
     display: flex;
     flex-direction: column;
+    gap: 5px;
 }
+
+.personal {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+
+.personal-avatar {
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+}
+
 
 .personals,
 .rooms {
@@ -22,6 +42,35 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.room {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.room-settings-icon {
+    width: 1em;
+    margin-left:auto;
+}
+
+.room-avatar {
+    border-radius: 10%;
+    background:#2492FF;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.room > *, .personal > * {
+    pointer-events: none;
+}
+.room > i {
+    color: #ccc;
 }
 
 .new-personal, .new-room {

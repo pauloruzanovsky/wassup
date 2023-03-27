@@ -10,6 +10,8 @@ import {setDoc, doc, serverTimestamp} from 'firebase/firestore';
 export default function Sidebar(props:any) {
     const [showNewRoomModal, setShowNewRoomModal] = useState(false);
     const [newRoomInputValue, setNewRoomInputValue] = useState("");
+    const [newRoomError, setNewRoomError] = useState('');
+
 
     const [showNewPersonalModal, setShowNewPersonalModal] = useState(false);
     const [newPersonalInputValue, setNewPersonalInputValue] = useState("");
@@ -32,21 +34,33 @@ export default function Sidebar(props:any) {
                 setShowNewRoomModal(false);
             })
         }
-       
-   
+    }
+
+    const handleNewRoomInputValueChange = (e:any) => {
+        setNewRoomError('')
+        setNewRoomInputValue(e.target.value)
+        if(e.target.value.includes('.') || e.target.value.includes('/')) {
+            setNewRoomError(`Please don't use '.' or '/'`)
+        }
+
+        const roomAlreadyExists = props.rooms.find((room:any) => room.title === e.target.value)
+
+        if(roomAlreadyExists) {
+            setNewRoomError(`Room name already used`)
+
+        }
+
     }
 
     const handleNewPersonalInputChange = (e:any) => {
         setNewPersonalInputValue(e.target.value)
         setFilteredUsers([])
-        console.log(props.usersData)
-        console.log(props.currentUser)
         const newFilteredUsers:any[] = []
         props.usersData.forEach((user:any) => {
-            console.log(user.email.toLowerCase() !== (props.user?.email.toLowerCase()))
              const shouldShowUser =  user.displayName.toLowerCase().includes(e.target.value.toLowerCase()) && 
                                      e.target.value && 
                                      user.email.toLowerCase() !== (props.user?.email.toLowerCase())
+
              if(shouldShowUser) {
                  newFilteredUsers.push(user)
                  setFilteredUsers(newFilteredUsers)
@@ -58,34 +72,32 @@ export default function Sidebar(props:any) {
     
     const startPersonalWithUser = (e:any) => {
         const secondUserEmail = e.target.querySelector('.text-wrapper').querySelector('.suggestion-user-email').textContent
+        const secondUserName = e.target.querySelector('.text-wrapper').querySelector('.suggestion-user-name').textContent
+
+        let usersPersonalRoom = props.rooms.filter(room => (room.type === 'personal') && (room.firstUser.email === secondUserEmail || room.secondUser.email === secondUserEmail) && (room.firstUser.email === props.user.email || room.secondUser.email === props.user.email))
+        console.log(!usersPersonalRoom[0])
+        if(!usersPersonalRoom[0]) {
+            props.usersData.forEach( async (user:any) => {
+                if(user.email === secondUserEmail) {
+                    const personalTitle = `${props.user.displayName} and  ${secondUserName} personal chat`
+    
+                    await setDoc(doc(fireStore,'rooms', personalTitle), {
+                        title: personalTitle,
+                        createdAt: serverTimestamp(),
+                        type: 'personal',
+                        firstUser: JSON.parse(JSON.stringify(props.user)),
+                        secondUser: user    
+                    }).then(() => {
+                        setNewPersonalInputValue('')
+                        setShowNewPersonalModal(false);
+                    })
+                }
+            })
+        }
         
-        props.usersData.forEach( async (user:any) => {
-            if(user.email === secondUserEmail) {
-                const personalTitle = `${props.user.email} and  ${secondUserEmail} personal chat`
-
-
-                await setDoc(doc(fireStore,'rooms', personalTitle), {
-                    title: personalTitle,
-                    createdAt: serverTimestamp(),
-                    type: 'personal',
-                    firstUser: JSON.parse(JSON.stringify(props.user)),
-                    secondUser: user    
-                }).then(() => {
-                    setNewPersonalInputValue('')
-                    setShowNewPersonalModal(false);
-                })
-
-
-                // setDoc(doc(fireStore,'rooms',currentRoom.title), 
-                //         {
-                //         ...currentRoom,
-                //         users: [...currentRoom.users, user]  
-                //         }
-                // )
-            }
-        })
-        
-    setNewPersonalInputValue('');
+        usersPersonalRoom = props.rooms.filter(room => (room.type === 'personal') && (room.firstUser.email === secondUserEmail || room.secondUser.email === secondUserEmail) && (room.firstUser.email === props.user.email || room.secondUser.email === props.user.email))
+        props.setCurrentDb(usersPersonalRoom[0].title)
+        setNewPersonalInputValue('');
     }
 
     useEffect(() => {
@@ -134,10 +146,13 @@ export default function Sidebar(props:any) {
                     <div className='personals-content'>
                     {props.rooms && props.rooms.map((room:any) => {
                         if(room.type === 'personal') {
-                            let shouldShowPersonal = room.firstUser.email === props.user.email || room.secondUser.email === props.user.email
+                            let shouldShowPersonal = [room.firstUser.email,room.secondUser.email].includes(props.user.email) 
                             if(shouldShowPersonal) {
                                 return(
-                                    <Link to={`/${room.title}`} onClick={props.switchChat} key={room.title}>{room.firstUser.email === props.user.email ? room.secondUser.email : room.firstUser.email}</Link>
+                                    <Link to={`/${room.title}`} onClick={props.switchChat} key={room.title} className='personal'>
+                                            <img src={room.firstUser.email === props.user.email ? room.secondUser.photoURL : room.firstUser.photoURL} alt="" className="personal-avatar" />
+                                            <div className='personal-name'>{room.firstUser.email === props.user.email ? room.secondUser.displayName : room.firstUser.displayName}</div>                                      
+                                    </Link>
                                 )
                             }
                         }
@@ -178,7 +193,15 @@ export default function Sidebar(props:any) {
                                 let shouldShowRoom = room.users.some((roomUser:any) => roomUser.email === props.user.email)
                                 if(shouldShowRoom) {
                                     return(
-                                        <Link to={`/${room.title}`} onClick={props.switchChat} key={room.title}>{room.title}</Link>
+                                        <Link to={`/${room.title}`} onClick={props.switchChat} className='room' key={room.title}>
+                                           <div className='room-avatar'>
+                                            {room.title[0]}
+                                            </div> 
+                                            <div className="room-title">
+                                                {room.title}
+                                            </div>
+                                            <i>{room.title === 'welcome' && 'public'}</i>
+                                        </Link>
                                     )
                                 }
                             }
@@ -189,12 +212,16 @@ export default function Sidebar(props:any) {
                         <form className='new-room-form'>
                             <div>Create a room</div>
                             <input value={newRoomInputValue}
-                                    onChange={(e) => setNewRoomInputValue(e.target.value)}
+                                    onKeyDown= {(event:any) => {
+                                        if(event.key === 'Enter' && newRoomError) {
+                                            event.preventDefault()
+                                    }}}
+                                    onChange={handleNewRoomInputValueChange}
                                     className='new-room-input' 
                                     placeholder='Room name'/>
-                            <button 
-                                onClick={createNewRoom}
-                                className='new-room-submit-button'>Create Room</button>
+                                    {newRoomError ? 
+                                    <div className='new-room-error'>{newRoomError}</div> :
+                                    <button onClick={createNewRoom} className='new-room-submit-button'>Create Room</button>}
                         </form>
                         </div>}
                 </div>
