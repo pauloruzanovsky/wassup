@@ -10,6 +10,9 @@ import settingsIcon from '../assets/setting.png'
 import sendMsgIcon from '../assets/send-message.png'
 import '../style/Chat.css'
 import '../style/Sidebar.css'
+import personalsIcon from '../assets/chat.png'
+import roomsIcon from '../assets/group.png'
+import headerMenuIcon from '../assets/user.png'
 
 
 export default function Chat(props:any) {
@@ -60,6 +63,7 @@ export default function Chat(props:any) {
         
     }
     const switchChat = (e:any) => {
+        showMainChat();
         setShouldScroll(true)
         if(e.target.className === 'room') {
             setCurrentDb(e.target.querySelector('.room-title').textContent)  
@@ -125,6 +129,60 @@ export default function Chat(props:any) {
     
    }
 
+   const showHeader = () => {
+    const header = document.getElementsByTagName('header')[0];
+    const mainChat = document.querySelector('.main')
+    const personals = document.querySelector('.personals')
+    const rooms = document.querySelector('.rooms')
+    const sideBar = document.querySelector ('.sidebar')
+    header.className = 'show';
+    mainChat && (mainChat.className = 'hide main')
+    personals && (personals.className = 'hide personals')
+    rooms && (rooms.className = 'hide rooms')
+    sideBar && (sideBar.className = 'hide sidebar')
+   }
+
+   const showPersonals = () => {
+    const header = document.getElementsByTagName('header')[0];
+    const mainChat = document.querySelector('.main')
+    const personals = document.querySelector('.personals')
+    const rooms = document.querySelector('.rooms')
+    const sideBar = document.querySelector ('.sidebar')
+    header.className = 'hide';
+    mainChat && (mainChat.className = 'hide main')
+    personals && (personals.className = 'show personals')
+    rooms && (rooms.className = 'hide rooms')
+    sideBar && (sideBar.className = 'show sidebar')
+   }
+
+   const showRooms = () => {
+    const header = document.getElementsByTagName('header')[0];
+    const mainChat = document.querySelector('.main')
+    const personals = document.querySelector('.personals')
+    const rooms = document.querySelector('.rooms')
+    const sideBar = document.querySelector ('.sidebar')
+    header.className = 'hide';
+    mainChat && (mainChat.className = 'hide main')
+    personals && (personals.className = 'hide personals')
+    rooms && (rooms.className = 'show rooms')
+    sideBar && (sideBar.className = 'show sidebar')
+   }
+
+   const showMainChat = () => {
+    const header = document.getElementsByTagName('header')[0];
+    const mainChat = document.querySelector('.main')
+    const personals = document.querySelector('.personals')
+    const rooms = document.querySelector('.rooms')
+    const sideBar = document.querySelector ('.sidebar')
+    header.className = 'hide';
+    mainChat && (mainChat.className = 'show main')
+    rooms && (rooms.className = 'hide rooms')
+    personals && (personals.className = 'hide personals')
+    sideBar && (sideBar.className = 'show sidebar')
+   }
+
+   
+
     useEffect(() => {
 
         addUserToWelcomeRoom()
@@ -178,7 +236,8 @@ export default function Chat(props:any) {
                     setRooms={setRooms}
                     user={user}
                     usersData={props.usersData}
-                    setCurrentDb={setCurrentDb}/>
+                    setCurrentDb={setCurrentDb}
+                    showMainChat={showMainChat}/>
                 <div className='main'>
                     <div className='chat-header'>
                         <div className='chat-title'>{currentRoom?.type === 'personal' ? 
@@ -235,6 +294,18 @@ export default function Chat(props:any) {
                         </button>
                     </form>
                 </div>
+                <nav className='mobile-navbar'>
+                        <div onClick={showPersonals}>
+                            <img src={personalsIcon}/>
+                        </div>
+                        <div onClick={showRooms}>
+                        <img src={roomsIcon}/>
+                        </div>
+                        <div onClick={showHeader}>
+                        <img src={headerMenuIcon}/>
+                        </div>
+
+                    </nav>
             </div>
         </BrowserRouter>
 

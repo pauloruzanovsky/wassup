@@ -3,7 +3,7 @@ import {signInWithPopup} from 'firebase/auth'
 import Chat from './components/Chat';
 import {collection, setDoc, doc, query, orderBy} from 'firebase/firestore';
 import {useCollectionData} from 'react-firebase-hooks/firestore';
-import  { useEffect } from 'react';
+import  { useEffect, useState } from 'react';
 import './style/App.css'
 
 
@@ -14,6 +14,7 @@ export default function App() {
     const usersQuery = query(usersCollection, orderBy('displayName'));
     const [usersData, isLoading] = useCollectionData(query(usersCollection, orderBy('displayName')));
     const user = auth.currentUser;
+    const [loggedUser, setLoggedUser] = useState(user)
 
     console.log(usersData);
     const registerUser = () => {
@@ -34,12 +35,14 @@ export default function App() {
 
     const signOut = () => {
         auth.signOut()
+        setLoggedUser(null)
     }
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
             if(user) {
                 registerUser()
+                setLoggedUser(user)
             }
         })
         return unsubscribe;
@@ -47,7 +50,7 @@ export default function App() {
 
     return (
         <div className='login-page'>
-            {user ? <Chat
+            {loggedUser ? <Chat
                         user={user}
                         usersData={usersData}
                         signOut={signOut}/> :

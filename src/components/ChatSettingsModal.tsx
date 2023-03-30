@@ -10,7 +10,7 @@ export default function ChatSettingsModal(props:any) {
 
     const isCurrentUserAdmin = props.currentRoom.admins.some((admin:any) => admin.email === props.currentUser?.email)
     const currentRoomDoc = props.currentRoom && doc(fireStore,'rooms',props.currentRoom.title)
-    const sortedRoomUsers = props.currentRoom.users.sort((a,b) => {
+    const sortedRoomUsers = props.currentRoom.users.sort((a:any,b:any) => {
         const nameA = a.displayName.toLowerCase()
         const nameB = b.displayName.toLowerCase()
 
@@ -122,4 +122,5 @@ export default function ChatSettingsModal(props:any) {
         </div>
     )
             }
+    return (<></>)
 }

@@ -74,7 +74,7 @@ export default function Sidebar(props:any) {
         const secondUserEmail = e.target.querySelector('.text-wrapper').querySelector('.suggestion-user-email').textContent
         const secondUserName = e.target.querySelector('.text-wrapper').querySelector('.suggestion-user-name').textContent
 
-        let usersPersonalRoom = props.rooms.filter(room => (room.type === 'personal') && (room.firstUser.email === secondUserEmail || room.secondUser.email === secondUserEmail) && (room.firstUser.email === props.user.email || room.secondUser.email === props.user.email))
+        let usersPersonalRoom = props.rooms.filter((room:any) => (room.type === 'personal') && (room.firstUser.email === secondUserEmail || room.secondUser.email === secondUserEmail) && (room.firstUser.email === props.user.email || room.secondUser.email === props.user.email))
         console.log(!usersPersonalRoom[0])
         if(!usersPersonalRoom[0]) {
             props.usersData.forEach( async (user:any) => {
@@ -95,7 +95,7 @@ export default function Sidebar(props:any) {
             })
         }
         
-        usersPersonalRoom = props.rooms.filter(room => (room.type === 'personal') && (room.firstUser.email === secondUserEmail || room.secondUser.email === secondUserEmail) && (room.firstUser.email === props.user.email || room.secondUser.email === props.user.email))
+        usersPersonalRoom = props.rooms.filter((room:any) => (room.type === 'personal') && (room.firstUser.email === secondUserEmail || room.secondUser.email === secondUserEmail) && (room.firstUser.email === props.user.email || room.secondUser.email === props.user.email))
         props.setCurrentDb(usersPersonalRoom[0].title)
         setNewPersonalInputValue('');
     }
@@ -137,7 +137,7 @@ export default function Sidebar(props:any) {
     return(
         <nav className='sidebar'>
                 <div className='personals'>
-                    <div className='rooms-title'>
+                    <div className='personals-title'>
                         <h3>Personal Chats</h3>
                         <button onClick={() => {setShowNewPersonalModal(true)}} className='new-personal' >
                             <img src={addIcon}/>
