@@ -78,7 +78,7 @@ export default function ChatSettingsModal(props:any) {
 
 
     return(
-        <div className='chat-settings-modal'>
+        <div className='chat-settings-modal' >
             <div className='chat-settings-buttons'>
                 <Link to='welcome'>                
                     <button className='chat-settings-button' onClick={leaveRoom}>Leave Room</button>

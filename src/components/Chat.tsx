@@ -5,7 +5,7 @@ import {useCollectionData, useDocumentData} from 'react-firebase-hooks/firestore
 import ChatMessage from './ChatMessage';
 import ChatSettingsModal from './ChatSettingsModal'
 import Sidebar from './Sidebar';
-import {BrowserRouter, Routes, Route, Navigate, useNavigate} from 'react-router-dom'
+import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom'
 import settingsIcon from '../assets/setting.png'
 import sendMsgIcon from '../assets/send-message.png'
 import '../style/Chat.css'
@@ -38,7 +38,7 @@ export default function Chat(props:any) {
     const [addUserInputValue, setAddUserInputValue] = useState("");
     const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
     const [showChatSettingsModal, setShowChatSettingsModal] = useState(false);
-
+  
     const sendMessage = async(e:any) => {
         e.preventDefault();
 
@@ -179,9 +179,7 @@ export default function Chat(props:any) {
     rooms && (rooms.className = 'hide rooms')
     personals && (personals.className = 'hide personals')
     sideBar && (sideBar.className = 'show sidebar')
-   }
-
-   
+   }   
 
     useEffect(() => {
 
@@ -219,9 +217,10 @@ export default function Chat(props:any) {
         }
 
        document.addEventListener("click",hideModal)    
-        
+       
+
     },[showChatSettingsModal])
-    
+
     return(
         <BrowserRouter>
             <div className='app'>  
@@ -237,7 +236,8 @@ export default function Chat(props:any) {
                     user={user}
                     usersData={props.usersData}
                     setCurrentDb={setCurrentDb}
-                    showMainChat={showMainChat}/>
+                    showMainChat={showMainChat}
+                    />
                 <div className='main'>
                     <div className='chat-header'>
                         <div className='chat-title'>{currentRoom?.type === 'personal' ? 
@@ -247,8 +247,8 @@ export default function Chat(props:any) {
                             </>
                             : currentRoom?.title}</div>
                             <div>
-                                <img src={settingsIcon} className='chat-settings-icon' title='Room settings' onClick={() => {setShowChatSettingsModal(true)}}/>
-                                {showChatSettingsModal && <ChatSettingsModal 
+                                {currentRoom?.type === 'room' && <img src={settingsIcon} className='chat-settings-icon' title='Room settings' onClick={() => {setShowChatSettingsModal(true)}}/>}
+                                {showChatSettingsModal && <ChatSettingsModal
                                                                             addUserInputValue={addUserInputValue}
                                                                             handleNewUserInputChange={handleNewUserInputChange}
                                                                             filteredUsers={filteredUsers}

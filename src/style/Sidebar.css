@@ -97,10 +97,11 @@ a {
     background:rgb(243, 242, 242);
 }
 
-.new-room-modal {
+.new-personal-modal, .new-room-modal {
     position: absolute;
-    top: 500px;
-    left: 240px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     background: rgb(255, 255, 255);
     border-radius: 10px;
     color: rgb(0, 0, 0);
@@ -108,18 +109,6 @@ a {
     padding: 10px;
     gap: 10px;
 
-}
-
-.new-personal-modal {
-    position: absolute;
-    top: 80px;
-    left: 240px;
-    background: rgb(255, 255, 255);
-    border-radius: 10px;
-    color: rgb(0, 0, 0);
-    box-shadow: 0px 0px 10px #ccc;
-    padding: 10px;
-    gap: 10px;
 }
 
 .new-room-form, .new-personal-form{

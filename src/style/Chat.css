@@ -109,10 +109,11 @@ header > button:active {
     align-self: flex-end;
 }
 
-.add-user-modal, .remove-user-modal, .chat-settings-modal {
+.chat-settings-modal {
     position: absolute;
-    top: 110px;
-    right: 15px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     background: rgb(255, 255, 255);
     border-radius: 10px;
     color: rgb(0, 0, 0);
@@ -124,14 +125,7 @@ header > button:active {
     padding: 10px;
 }
 
-.add-user-modal > p {
-    padding-top: 10px;
 
-}
-
-.add-user-modal > input {
-    margin: 10px;
-}
 
 .suggestion-user {
     display: flex;
