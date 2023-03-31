@@ -3,10 +3,12 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    text-align: center;
     height: 100vh;    
     gap: 20px;
     background: rgb(31, 137, 199);
     color: white;
+    width: 100vw;
 }
 
 .login-page > button {
@@ -23,4 +25,10 @@
 
 .login-page > button:active {
     background: black;
+}
+
+#root {
+    display: flex;
+    align-items:center;
+    justify-content: center;
 }

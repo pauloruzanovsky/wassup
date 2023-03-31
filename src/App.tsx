@@ -56,7 +56,7 @@ export default function App() {
                         signOut={signOut}/> :
                         <div className='login-page'>
                             <div>
-                                Wassup, a minimalistic chat app.
+                                Wassup, a minimalist chat app built with React, Typescript and Firebase.
                             </div>
                             <button onClick={handleSignUp}>Sign in with Google</button>
 
