@@ -49,12 +49,18 @@ export default function App() {
     },[isLoading])
 
     return (
-        <div className='login-page'>
+        <div>
             {loggedUser ? <Chat
                         user={user}
                         usersData={usersData}
                         signOut={signOut}/> :
-            <button onClick={handleSignUp}>Sign In</button>
+                        <div className='login-page'>
+                            <div>
+                                Wassup, a minimalistic chat app.
+                            </div>
+                            <button onClick={handleSignUp}>Sign in with Google</button>
+
+                        </div>
                     }
         </div>
     )

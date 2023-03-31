@@ -74,7 +74,7 @@ header > button:active {
 }
 
 .chat-header {
-    box-shadow: 0px 0px 5px #888888;
+    border-bottom: 1px solid #ccc;
     padding: 10px;
     font-size: 20px;
     display: flex;
@@ -89,9 +89,9 @@ header > button:active {
     height: 1em;
 }
 
-.personal-email {
-    color: #464646;
-    font-size: 0.8em;
+.room-subtitle {
+    color: #5d5c5c;
+    font-size: 0.7em;
 }
 
 .add-user-icon, .chat-settings-icon {
@@ -202,6 +202,7 @@ input:focus{
         flex-direction: column;
         justify-content: center;
         text-align: center;
+        border: 0px;
     }
 
     .user-avatar {
@@ -225,6 +226,8 @@ input:focus{
         gap: 20px;
         justify-content: space-around;
         margin-top: auto;
+        border-top: 1px solid #e4e1e1;
+
     }
 
     .mobile-navbar > div {

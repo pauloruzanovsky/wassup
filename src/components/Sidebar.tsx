@@ -100,14 +100,6 @@ export default function Sidebar(props:any) {
         setNewPersonalInputValue('');
     }
 
-    const handleNewPersonalModal = (event:any, element:string) => {
-        setShowNewPersonalModal(true)
-        const modal = document.querySelector(element);
-        const width = modal.offsetWidth/2 + 10
-        const height = modal.offsetHeight/2 + 10
-        setMousePos([event.pageX-width, event.pageY+height])
-       }
-
     useEffect(() => {
 
         const hideNewRoomModal = (event:any) => {
@@ -147,7 +139,7 @@ export default function Sidebar(props:any) {
                 <div className='personals'>
                     <div className='personals-title'>
                         <h3>Personal Chats</h3>
-                        <button onClick={(e) => {handleNewPersonalModal(e,'.new-personal-modal')}} className='new-personal' >
+                        <button onClick={() => {setShowNewPersonalModal(true)}} className='new-personal' >
                             <img src={addIcon}/>
                         </button>
                     </div>                    

@@ -225,7 +225,7 @@ export default function Chat(props:any) {
         <BrowserRouter>
             <div className='app'>  
                 <header>
-                    <b className='header-text'>{`Hello ${props.user.displayName}!`}</b>
+                    <div className='header-text'>{`Hello, ${props.user.displayName}`}</div>
                     <img className='user-avatar' src={props.user.photoURL} alt={props.user.displayName}/>
                     <button onClick={props.signOut}>Sign Out</button>
                 </header>
@@ -242,10 +242,13 @@ export default function Chat(props:any) {
                     <div className='chat-header'>
                         <div className='chat-title'>{currentRoom?.type === 'personal' ? 
                             <>
-                            <div className='personal-title'>{currentRoom.firstUser.email === props.user.email ? currentRoom.secondUser.displayName : currentRoom.firstUser.displayName}</div>
-                            <div className='personal-email'>{currentRoom.firstUser.email === props.user.email ? currentRoom.secondUser.email : currentRoom.firstUser.email}</div>
+                            <div className='room-title'>{currentRoom.firstUser.email === props.user.email ? currentRoom.secondUser.displayName : currentRoom.firstUser.displayName}</div>
+                            <div className='room-subtitle'>{currentRoom.firstUser.email === props.user.email ? currentRoom.secondUser.email : currentRoom.firstUser.email}</div>
                             </>
-                            : currentRoom?.title}</div>
+                            : <>
+                                <div className='room-title'>{currentRoom?.title}</div>
+                                <div className='room-subtitle'>{currentRoom?.users.length} {currentRoom?.users.length > 1 ? 'users' : 'user'} in this room</div>
+                                </>}</div>
                             <div>
                                 {currentRoom?.type === 'room' && <img src={settingsIcon} className='chat-settings-icon' title='Room settings' onClick={() => {setShowChatSettingsModal(true)}}/>}
                                 {showChatSettingsModal && <ChatSettingsModal
@@ -297,12 +300,15 @@ export default function Chat(props:any) {
                 <nav className='mobile-navbar'>
                         <div onClick={showPersonals}>
                             <img src={personalsIcon}/>
+                            <div>DMs</div>
                         </div>
                         <div onClick={showRooms}>
                         <img src={roomsIcon}/>
+                        <div>Rooms</div>
                         </div>
                         <div onClick={showHeader}>
                         <img src={headerMenuIcon}/>
+                        <div>User</div>
                         </div>
 
                     </nav>
